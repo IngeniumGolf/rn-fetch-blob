@@ -607,26 +607,14 @@ class RNFetchBlobFS {
             callback.invoke("Source file at path `" + path + "` does not exist");
             return;
         }
-
         try {
-            InputStream in = new FileInputStream(path);
-            OutputStream out = new FileOutputStream(dest);
-
-            //read source path to byte buffer. Write from input to output stream
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = in.read(buffer)) != -1) { //read is successful
-                out.write(buffer, 0, read);
+            boolean result = src.renameTo(new File(dest));
+            if (!result) {
+                callback.invoke("mv failed for unknown reasons");
+                return;
             }
-            in.close();
-            out.flush();
-
-            src.delete(); //remove original file
-        } catch (FileNotFoundException exception) {
-            callback.invoke("Source file not found.");
-            return;
         } catch (Exception e) {
-            callback.invoke(e.toString());
+            callback.invoke(e.getLocalizedMessage());
             return;
         }
 
